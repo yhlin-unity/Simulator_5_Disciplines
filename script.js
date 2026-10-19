@@ -279,7 +279,7 @@ tailwind.config = {
         }
 
         function getCorrectAnswerText(item, testType) {
-            if (testType === 2 || testType === 4) {
+            if (testType === 2 || testType === 3) {
                 return item.cn; // Correct Chinese
             } else {
                 return item.en; // Correct English
@@ -287,7 +287,7 @@ tailwind.config = {
         }
 
         function generateOptions(targetItem, fullPool, testType) {
-            const isChineseOption = (testType === 2 || testType === 4);
+            const isChineseOption = (testType === 2 || testType === 3);
             const targetVal = isChineseOption ? targetItem.cn : targetItem.en;
 
             // Distractors
@@ -331,16 +331,16 @@ tailwind.config = {
                     qTypeLabel.innerText = "中譯英拼寫"; audioBox.classList.add('hidden'); textBox.classList.remove('hidden');
                     document.getElementById('q-title-text').innerText = q.chinese; document.getElementById('q-sub-hint').innerText = `請拼寫英文單字（${q.word.length} 個字母）`;
                     optionsGrid.classList.add('hidden'); spellingArea.classList.remove('hidden'); document.getElementById('input-spelling').value = ''; setTimeout(() => document.getElementById('input-spelling').focus(), 100); break;
-                case 2: case 3:
-                    badgeEl.innerText = q.testType === 2 ? "測驗二：聽英文發音，選中文" : "測驗三：聽英文發音，選英文";
-                    badgeEl.className = q.testType === 2 ? "bg-blue-100 text-blue-800 text-xs font-extrabold px-3 py-1 rounded-lg" : "bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-lg";
-                    qTypeLabel.innerText = q.testType === 2 ? "聽音選中文" : "聽音選英文";
-                    audioBox.classList.remove('hidden'); textBox.classList.add('hidden'); optionsGrid.classList.remove('hidden'); spellingArea.classList.add('hidden'); break;
-                case 4:
-                    badgeEl.innerText = "測驗四：看英文，選中文"; badgeEl.className = "bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                case 2:
+                    badgeEl.innerText = "測驗二：看英文，選中文"; badgeEl.className = "bg-blue-100 text-blue-800 text-xs font-extrabold px-3 py-1 rounded-lg";
                     qTypeLabel.innerText = "閱讀英譯中"; audioBox.classList.add('hidden'); textBox.classList.remove('hidden');
                     document.getElementById('q-title-text').innerText = q.word; document.getElementById('q-sub-hint').innerText = "請選出對應的中文含意";
                     optionsGrid.classList.remove('hidden'); spellingArea.classList.add('hidden'); break;
+                case 3: case 4:
+                    badgeEl.innerText = q.testType === 3 ? "測驗三：聽英文發音，選中文" : "測驗四：聽英文發音，選英文";
+                    badgeEl.className = q.testType === 3 ? "bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-lg" : "bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                    qTypeLabel.innerText = q.testType === 3 ? "聽音選中文" : "聽音選英文";
+                    audioBox.classList.remove('hidden'); textBox.classList.add('hidden'); optionsGrid.classList.remove('hidden'); spellingArea.classList.add('hidden'); break;
                 case 5: case 6:
                     badgeEl.innerText = q.testType === 5 ? "測驗五：看中文，聽選英文發音" : "測驗六：看英文，聽選英文發音"; badgeEl.className = "bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-lg";
                     qTypeLabel.innerText = "閱讀提示與英文聽辨"; audioBox.classList.add('hidden'); textBox.classList.remove('hidden'); document.getElementById('q-title-text').innerText = q.testType === 5 ? q.chinese : q.word; document.getElementById('q-sub-hint').innerText = "請聽選項發音，選出正確英文"; optionsGrid.classList.remove('hidden'); spellingArea.classList.add('hidden'); break;
@@ -372,7 +372,7 @@ tailwind.config = {
 
             // Keep only one autoplay timer while changing questions.
             clearTimeout(autoPlayTimer);
-            if ((q.testType === 2 || q.testType === 3) && audioEnabled) {
+            if ((q.testType === 3 || q.testType === 4) && audioEnabled) {
                 autoPlayTimer = setTimeout(() => playCurrentQuestionAudio(), 450);
             }
         }
@@ -893,7 +893,7 @@ tailwind.config = {
                 }
 
                 // Space key for playing audio
-                if (e.code === 'Space' && (q.testType === 2 || q.testType === 3)) {
+                if (e.code === 'Space' && (q.testType === 3 || q.testType === 4)) {
                     e.preventDefault();
                     playCurrentQuestionAudio();
                 }
