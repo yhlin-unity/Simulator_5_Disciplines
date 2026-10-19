@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PVQC 專業英文詞彙能力模擬考試系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        pvqc: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .animate-pulse-fast {
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 antialiased flex flex-col bg-slate-100 selection:bg-pvqc-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-pvqc-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('view-home')">
+                <div class="bg-pvqc-600 p-2 rounded-lg text-white shadow-inner">
+                    <i class="fa-solid fa-graduation-cap text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
+                        PVQC 模擬檢定系統
+                        <span class="text-xs font-normal bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full font-bold">測驗2-6全收錄</span>
+                    </h1>
+                    <p class="text-xs text-pvqc-100 hidden sm:block">Professional Vocabulary Quotient Credential Simulator</p>
+                </div>
+            </div>
+
+            <!-- Top Nav Options -->
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <button onclick="switchView('view-home')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-pvqc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden md:inline">測驗大廳</span>
+                </button>
+                <button onclick="switchView('view-words')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-pvqc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span class="hidden md:inline">字彙瀏覽與匯入</span>
+                </button>
+                <button onclick="switchView('view-history')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-pvqc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span class="hidden md:inline">歷次成績分析</span>
+                </button>
+                
+                <!-- Audio Status Indicator -->
+                <button id="audio-toggle-btn" onclick="toggleAudioSetting()" class="p-2 rounded-lg hover:bg-pvqc-800 transition text-pvqc-100 hover:text-white" title="聲音切換">
+                    <i id="audio-icon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- VIEW 1: HOME / TEST SELECTION DASHBOARD -->
+        <section id="view-home" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-pvqc-800 to-indigo-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-black pointer-events-none">
+                    PVQC
+                </div>
+                <div class="max-w-2xl space-y-3 relative z-10">
+                    <div class="inline-flex items-center gap-2 bg-pvqc-600/50 border border-pvqc-400/30 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-pvqc-100">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i> 已排除測驗一（聽寫/拼寫）項目
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">PVQC 專家級與各專業領域詞彙大師</h2>
+                    <p class="text-pvqc-100 text-sm sm:text-base leading-relaxed">
+                        提供專用 PVQC 測驗二至測驗六全功能模擬。支援單獨題型練習與全真模擬測驗，配合內建語音朗讀與完整錯題檢討機制！
+                    </p>
+                </div>
+            </div>
+
+            <!-- Configuration Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-pvqc-600"></i> 測驗設定與類別選擇
+                        </h3>
+                        <p class="text-xs text-slate-500">選擇欲練習的專業字彙領域及測驗參數</p>
+                    </div>
+                    <span id="word-count-badge" class="bg-pvqc-50 text-pvqc-700 text-xs font-bold px-3 py-1 rounded-full border border-pvqc-200">
+                        載入中...
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Word Dataset Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">專業詞彙類別</label>
+                        <select id="select-category" onchange="onCategoryChange()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-pvqc-500 focus:border-pvqc-500 transition">
+                            <option value="EXPERT_ALL">全套 PVQC 專家級 A-Z 字彙 (內建組)</option>
+                            <option value="IT_COMPUTER">資訊與計算機專業詞彙 (IT & CS)</option>
+                            <option value="BUSINESS">商業管理與企劃 (Business & Mgmt)</option>
+                            <option value="HOSPITALITY">餐旅與觀光英文 (Hospitality)</option>
+                            <option value="MEDICAL">醫護與健康照護 (Medical & Care)</option>
+                            <option value="FINANCE">金融與財務會計 (Finance & Accounting)</option>
+                            <option value="CUSTOM">自訂匯入字彙庫 (Custom Imported)</option>
+                        </select>
+                    </div>
+
+                    <!-- Question Count Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">測驗題數</label>
+                        <select id="select-count" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-pvqc-500 focus:border-pvqc-500 transition">
+                            <option value="10">10 題 (快速隨堂練習)</option>
+                            <option value="20" selected>20 題 (標準題數)</option>
+                            <option value="50">50 題 (深度測驗)</option>
+                            <option value="100">100 題 (全真模擬極限挑戰)</option>
+                        </select>
+                    </div>
+
+                    <!-- Mode Select -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">測驗模式</label>
+                        <select id="select-mode" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-pvqc-500 focus:border-pvqc-500 transition">
+                            <option value="EXAM">正式考試模式 (計時 / 結束後顯示總分與錯題)</option>
+                            <option value="PRACTICE">自主練習模式 (無時間限制 / 即時提示答案)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Types Grid (Test 2 to Test 6) -->
+            <div>
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-pvqc-600"></i> PVQC 測驗項目選擇 (測驗二 ~ 測驗六)
+                    </h3>
+                    <button onclick="startFullMockExam()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow hover:shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> 綜合全真模擬試驗 (測驗2~6綜合題)
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+                    <!-- Test 1 Disclaimer Card -->
+                    <div class="bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl p-5 flex flex-col justify-between opacity-60 relative overflow-hidden">
+                        <div class="absolute right-3 top-3 text-slate-400">
+                            <i class="fa-solid fa-ban text-xl"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <span class="inline-block bg-slate-200 text-slate-600 text-xs font-bold px-2.5 py-0.5 rounded">測驗一</span>
+                            <h4 class="font-bold text-slate-700 text-base">聽寫測驗 (Spelling)</h4>
+                            <p class="text-xs text-slate-500">聽英文發音拼寫單字 (依要求已將此項目排除/關閉)。</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-200 text-xs font-semibold text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-lock"></i> 未開放本項目
+                        </div>
+                    </div>
+
+                    <!-- Test 2 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-blue-100 text-pvqc-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗二</span>
+                                <span class="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded"><i class="fa-solid fa-headphones"></i> 聽力測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">聽英文選中文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                系統自動朗讀英文單字，請聽取發音後選出正確的中文解釋。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">單字聽力辨識</span>
+                            <button onclick="startSingleTest(2)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 3 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗三</span>
+                                <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded"><i class="fa-solid fa-headphones"></i> 聽力測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">聽英文選英文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                系統自動朗讀英文單字發音，請於選項中選出拼法相符之英文單字。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">發音拼字對照</span>
+                            <button onclick="startSingleTest(3)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 4 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗四</span>
+                                <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded"><i class="fa-solid fa-eye"></i> 閱讀測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">看英文選中文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                畫面顯示英文單字/專業術語，請從四個選項中選出正確中文翻譯。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">英譯中詞義辨識</span>
+                            <button onclick="startSingleTest(4)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 5 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-amber-100 text-amber-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗五</span>
+                                <span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded"><i class="fa-solid fa-eye"></i> 閱讀測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">看中文選英文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                畫面顯示中文專業術語，請從四個選項中選出對應正確的英文單字。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">中譯英詞彙回想</span>
+                            <button onclick="startSingleTest(5)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 6 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-purple-100 text-purple-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗六</span>
+                                <span class="text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded"><i class="fa-solid fa-keyboard"></i> 綜合拼寫</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">看中文拼寫英文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                題目給予中文含意及首尾或提示長度，輸入正確完整的英文單字。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">單字拼寫精準度</span>
+                            <button onclick="startSingleTest(6)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: LIVE EXAM INTERFACE -->
+        <section id="view-exam" class="hidden space-y-6 max-w-4xl mx-auto">
+            <!-- Top Exam Bar -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span id="exam-badge" class="bg-pvqc-100 text-pvqc-800 text-xs font-extrabold px-3 py-1 rounded-lg">
+                        測驗二
+                    </span>
+                    <span id="exam-mode-badge" class="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-1 rounded-md">
+                        正式測驗
+                    </span>
+                </div>
+
+                <!-- Timer & Score HUD -->
+                <div class="flex items-center gap-4">
+                    <div id="timer-container" class="flex items-center gap-1.5 font-mono text-base font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+                        <i class="fa-regular fa-clock text-pvqc-600"></i>
+                        <span id="exam-timer">00:00</span>
+                    </div>
+                    <button onclick="confirmAbortExam()" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
+                        <i class="fa-solid fa-xmark"></i> 離開測驗
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs font-semibold text-slate-500">
+                    <span>進度: <strong id="exam-progress-text" class="text-slate-800">1 / 20</strong></span>
+                    <span id="exam-accuracy-indicator">正確率: -- %</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                    <div id="exam-progress-bar" class="bg-pvqc-600 h-2.5 rounded-full transition-all duration-300" style="width: 5%"></div>
+                </div>
+            </div>
+
+            <!-- Main Question Card -->
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 space-y-6 relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-pvqc-600 bg-pvqc-50 px-2.5 py-1 rounded-md">
+                        Question <span id="q-index-number">1</span>
+                    </span>
+                    <span id="q-type-label" class="text-xs font-medium text-slate-400">
+                        聽力選義
+                    </span>
+                </div>
+
+                <!-- Audio Playback Control (for Listening Tests 2 & 3) -->
+                <div id="audio-question-box" class="flex flex-col items-center justify-center py-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <button id="btn-play-audio" onclick="playCurrentQuestionAudio()" class="w-16 h-16 bg-pvqc-600 hover:bg-pvqc-700 active:scale-95 text-white rounded-full shadow-lg flex items-center justify-center text-2xl transition group">
+                        <i class="fa-solid fa-volume-high group-hover:scale-110 transition"></i>
+                    </button>
+                    <p class="text-xs font-semibold text-slate-500">點擊播放發音 (快速鍵: Space 空格鍵)</p>
+                </div>
+
+                <!-- Text Question Box (for Reading Tests 4, 5, 6) -->
+                <div id="text-question-box" class="text-center py-4 space-y-2">
+                    <h3 id="q-title-text" class="text-2xl sm:text-4xl font-extrabold text-slate-800 tracking-tight">
+                        Algorithm
+                    </h3>
+                    <p id="q-sub-hint" class="text-xs text-slate-400 font-medium">請選出正確的中文對意</p>
+                </div>
+
+                <!-- Multiple Choice Options Grid (Tests 2, 3, 4, 5) -->
+                <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <!-- Option buttons dynamically rendered -->
+                </div>
+
+                <!-- Spelling Input Area (Test 6) -->
+                <div id="spelling-input-area" class="hidden space-y-4 pt-2">
+                    <div class="flex items-center justify-center gap-2">
+                        <input type="text" id="input-spelling" autocomplete="off" spellcheck="false" placeholder="請輸入對應的英文單字..." class="w-full max-w-md px-4 py-3 text-center text-lg sm:text-xl font-bold font-mono tracking-wide border-2 border-slate-300 rounded-xl focus:border-pvqc-600 focus:ring-0 outline-none uppercase transition">
+                    </div>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="submitSpellingAnswer()" class="bg-pvqc-600 hover:bg-pvqc-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow transition">
+                            確認送出 (Enter)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instant Feedback Alert Box (Practice Mode Only) -->
+                <div id="practice-feedback" class="hidden p-4 rounded-xl border flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i id="feedback-icon" class="text-2xl"></i>
+                        <div>
+                            <p id="feedback-title" class="font-bold text-sm"></p>
+                            <p id="feedback-detail" class="text-xs opacity-90"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion()" class="bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-slate-900 transition">
+                        下一題 <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Action Controls -->
+            <div class="flex justify-between items-center text-xs text-slate-500 px-1">
+                <span>提示: 可使用數字鍵 <kbd class="px-1.5 py-0.5 bg-white border rounded text-slate-700 font-mono">1</kbd> ~ <kbd class="px-1.5 py-0.5 bg-white border rounded text-slate-700 font-mono">4</kbd> 快速作答</span>
+                <button id="btn-skip" onclick="skipQuestion()" class="text-slate-500 hover:text-slate-800 font-bold underline">
+                    跳過此題
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 3: EXAM RESULTS & REVIEW -->
+        <section id="view-result" class="hidden space-y-6 max-w-4xl mx-auto">
+            <!-- Score Card Header -->
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 text-center space-y-4 relative overflow-hidden">
+                <div id="result-stamp" class="absolute -right-6 -top-6 w-32 h-32 rounded-full border-4 flex items-center justify-center font-black text-xl rotate-12 opacity-80 pointer-events-none">
+                    PASSED
+                </div>
+
+                <div class="inline-flex p-3 rounded-full bg-pvqc-50 text-pvqc-600 text-3xl mb-2">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">測驗完成與評分報告</h2>
+                <p id="result-subtitle" class="text-xs sm:text-sm text-slate-500">恭喜您完成了 PVQC 模擬測驗！以下為您的整體成績表現：</p>
+
+                <!-- Score Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">測驗得分</span>
+                        <span id="res-score" class="text-2xl sm:text-3xl font-black text-pvqc-600">0</span>
+                        <span class="text-xs text-slate-400">/ 100 分</span>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">答對率</span>
+                        <span id="res-accuracy" class="text-2xl sm:text-3xl font-black text-emerald-600">0%</span>
+                        <span id="res-counts-text" class="text-xs text-slate-400 block">0 / 0 題</span>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">總耗時</span>
+                        <span id="res-time" class="text-2xl sm:text-3xl font-black text-slate-700">00:00</span>
+                        <span class="text-xs text-slate-400 block">平均速: <span id="res-avg-time">0s</span>/題</span>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">認證評定</span>
+                        <span id="res-grade" class="text-xl sm:text-2xl font-black text-amber-500 block mt-1">未通過</span>
+                        <span class="text-xs text-slate-400">門檻: 70分以上</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap justify-center gap-3 pt-2">
+                    <button onclick="retestWrongWords()" id="btn-retest-wrong" class="bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> 錯題特別重測 (<span id="wrong-count-tag">0</span>)
+                    </button>
+                    <button onclick="switchView('view-home')" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> 再測一次
+                    </button>
+                    <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> 列印/保存成績
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detailed Answer Review List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-pvqc-600"></i> 逐題完整答題檢討與發音複習
+                    </h3>
+                    <div class="flex gap-2">
+                        <button onclick="filterReviewList('ALL')" class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-200 text-slate-700 hover:bg-slate-300">全部</button>
+                        <button onclick="filterReviewList('WRONG')" class="text-xs font-semibold px-2.5 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200">僅看錯題</button>
+                    </div>
+                </div>
+
+                <div id="review-list-container" class="space-y-3">
+                    <!-- Detailed review rows rendered dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: VOCABULARY LIBRARY & CSV IMPORTER -->
+        <section id="view-words" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-book text-pvqc-600"></i> PVQC 字彙庫總覽與自訂匯入
+                        </h3>
+                        <p class="text-xs text-slate-500">瀏覽系統內建與您自行匯入的 PVQC 專家級對照單字</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openCsvImportModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i> 匯入 CSV / 自訂單字
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Controls -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2 relative">
+                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="word-search-input" onkeyup="renderVocabularyTable()" placeholder="搜尋英文單字或中文解釋..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-pvqc-500 outline-none">
+                    </div>
+                    <div>
+                        <select id="word-category-filter" onchange="renderVocabularyTable()" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-700">
+                            <option value="ALL">全部類別單字</option>
+                            <option value="EXPERT_ALL">專家級字彙 (General Expert)</option>
+                            <option value="IT_COMPUTER">資訊科技 (IT / CS)</option>
+                            <option value="BUSINESS">商管領域 (Business)</option>
+                            <option value="HOSPITALITY">餐旅英文 (Hospitality)</option>
+                            <option value="MEDICAL">醫護與健康 (Medical)</option>
+                            <option value="FINANCE">金融財務 (Finance)</option>
+                            <option value="CUSTOM">自訂匯入 (Custom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Word Table Container -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-xs uppercase font-bold text-slate-700 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-4">#</th>
+                                <th class="py-3 px-4">英文單字 (English)</th>
+                                <th class="py-3 px-4">中文解釋 (Chinese)</th>
+                                <th class="py-3 px-4">歸屬領域</th>
+                                <th class="py-3 px-4 text-center">發音試聽</th>
+                            </tr>
+                        </thead>
+                        <tbody id="word-table-body" class="divide-y divide-slate-200 bg-white">
+                            <!-- Rows generated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: HISTORY & STATISTICS -->
+        <section id="view-history" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-pvqc-600"></i> 歷次測驗成績紀錄與學習曲線
+                        </h3>
+                        <p class="text-xs text-slate-500">本系統會將您的個人測驗結果保存在個人瀏覽器中</p>
+                    </div>
+                    <button onclick="clearHistoryRecords()" class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition">
+                        <i class="fa-solid fa-trash"></i> 清除歷史紀錄
+                    </button>
+                </div>
+
+                <div id="history-list-container" class="space-y-3">
+                    <!-- History rows dynamic -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CSV IMPORT MODAL DIALOG -->
+    <div id="modal-csv-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-file-csv text-emerald-600"></i> 自訂匯入 PVQC 字彙單字表
+                </h3>
+                <button onclick="closeCsvImportModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-500 leading-relaxed">
+                您可以直接將您的 PVQC 專家級 CSV (如 <code class="bg-slate-100 px-1 py-0.5 rounded text-pvqc-700 font-mono">PVQC_Expert_專家級字彙_中英對照_A.csv</code> 等) 檔案內容文字複製並貼於下方欄位中（每行格式為：<code class="bg-slate-100 px-1 py-0.5 rounded text-pvqc-700 font-mono">英文單字,中文解釋</code> 或逗號/Tab分隔）。
+            </p>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">貼上 CSV 文字內容：</label>
+                <textarea id="csv-paste-textarea" rows="8" placeholder="範例：&#10;algorithm,演算法&#10;bandwidth,頻寬&#10;cloud computing,雲端運算&#10;database,資料庫" class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-pvqc-500 outline-none"></textarea>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <span class="text-xs text-slate-400">亦可支援簡單的單字中文對照匯入</span>
+                <div class="flex gap-2">
+                    <button onclick="closeCsvImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                        取消
+                    </button>
+                    <button onclick="processCustomCsvImport()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition">
+                        確認匯入單字
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* PVQC EXAM SYSTEM CORE ENGINE & DATASETS */
+
+        // Built-in PVQC Expert & Specialized Vocabularies Database
+        const BUILTIN_VOCABULARY = [
+            // General Expert A-Z (PVQC Expert Words)
+            { en: "algorithm", cn: "演算法", category: "EXPERT_ALL" },
+            { en: "artificial intelligence", cn: "人工智慧", category: "EXPERT_ALL" },
+            { en: "authentication", cn: "身分驗證；認證", category: "EXPERT_ALL" },
+            { en: "bandwidth", cn: "頻寬", category: "EXPERT_ALL" },
+            { en: "benchmark", cn: "基準測試；標竿", category: "EXPERT_ALL" },
+            { en: "blockchain", cn: "區塊鏈", category: "EXPERT_ALL" },
+            { en: "browser", cn: "瀏覽器", category: "EXPERT_ALL" },
+            { en: "buffer", cn: "緩衝區", category: "EXPERT_ALL" },
+            { en: "capacity", cn: "容量；能力", category: "EXPERT_ALL" },
+            { en: "compatibility", cn: "相容性", category: "EXPERT_ALL" },
+            { en: "cybersecurity", cn: "網路安全", category: "EXPERT_ALL" },
+            { en: "data mining", cn: "資料探勘", category: "EXPERT_ALL" },
+            { en: "database", cn: "資料庫", category: "EXPERT_ALL" },
+            { en: "encryption", cn: "加密", category: "EXPERT_ALL" },
+            { en: "framework", cn: "框架；架構", category: "EXPERT_ALL" },
+            { en: "hardware", cn: "硬體", category: "EXPERT_ALL" },
+            { en: "infrastructure", cn: "基礎設施", category: "EXPERT_ALL" },
+            { en: "interface", cn: "介面；接口", category: "EXPERT_ALL" },
+            { en: "latency", cn: "延遲", category: "EXPERT_ALL" },
+            { en: "middleware", cn: "中介軟體", category: "EXPERT_ALL" },
+            { en: "network", cn: "網路", category: "EXPERT_ALL" },
+            { en: "optimization", cn: "最佳化", category: "EXPERT_ALL" },
+            { en: "protocol", cn: "通訊協定", category: "EXPERT_ALL" },
+            { en: "redundancy", cn: "備份；冗餘", category: "EXPERT_ALL" },
+            { en: "scalability", cn: "可擴充性", category: "EXPERT_ALL" },
+            { en: "software", cn: "軟體", category: "EXPERT_ALL" },
+            { en: "telecommunication", cn: "電信；遠距通訊", category: "EXPERT_ALL" },
+            { en: "virtualization", cn: "虛擬化", category: "EXPERT_ALL" },
+            { en: "vulnerability", cn: "弱點；漏洞", category: "EXPERT_ALL" },
+            { en: "wireless", cn: "無線的", category: "EXPERT_ALL" },
+
+            // IT & Computer (資訊與計算機)
+            { en: "application programming interface", cn: "應用程式介面 (API)", category: "IT_COMPUTER" },
+            { en: "cloud computing", cn: "雲端運算", category: "IT_COMPUTER" },
+            { en: "compiler", cn: "編譯器", category: "IT_COMPUTER" },
+            { en: "deep learning", cn: "深度學習", category: "IT_COMPUTER" },
+            { en: "firewall", cn: "防火牆", category: "IT_COMPUTER" },
+            { en: "open source", cn: "開放原始碼", category: "IT_COMPUTER" },
+            { en: "operating system", cn: "作業系統", category: "IT_COMPUTER" },
+            { en: "microservice", cn: "微服務", category: "IT_COMPUTER" },
+            { en: "router", cn: "路由器", category: "IT_COMPUTER" },
+            { en: "serverless", cn: "無伺服器架構", category: "IT_COMPUTER" },
+
+            // Business & Management (商管)
+            { en: "asset allocation", cn: "資產配置", category: "BUSINESS" },
+            { en: "benchmarking", cn: "標竿學習", category: "BUSINESS" },
+            { en: "brainstorming", cn: "腦力激盪", category: "BUSINESS" },
+            { en: "business model", cn: "商業模式", category: "BUSINESS" },
+            { en: "core competency", cn: "核心競爭力", category: "BUSINESS" },
+            { en: "corporate governance", cn: "公司治理", category: "BUSINESS" },
+            { en: "entrepreneurship", cn: "創業家精神", category: "BUSINESS" },
+            { en: "key performance indicator", cn: "關鍵績效指標 (KPI)", category: "BUSINESS" },
+            { en: "market penetration", cn: "市場滲透率", category: "BUSINESS" },
+            { en: "return on investment", cn: "投資報酬率 (ROI)", category: "BUSINESS" },
+
+            // Hospitality & Catering (餐旅觀光)
+            { en: "à la carte", cn: "單點選單", category: "HOSPITALITY" },
+            { en: "amenities", cn: "客房便利備品", category: "HOSPITALITY" },
+            { en: "buffet", cn: "自助餐", category: "HOSPITALITY" },
+            { en: "concierge", cn: "禮賓接待員", category: "HOSPITALITY" },
+            { en: "housekeeping", cn: "客房清潔房務", category: "HOSPITALITY" },
+            { en: "itinerary", cn: "旅遊行程表", category: "HOSPITALITY" },
+            { en: "reservation", cn: "預訂；預約", category: "HOSPITALITY" },
+            { en: "valet parking", cn: "代客停車", category: "HOSPITALITY" },
+
+            // Medical & Health (醫護健康)
+            { en: "cardiovascular", cn: "心血管的", category: "MEDICAL" },
+            { en: "diagnosis", cn: "診斷", category: "MEDICAL" },
+            { en: "epidemic", cn: "傳染病；流行病", category: "MEDICAL" },
+            { en: "intensive care unit", cn: "加護病房 (ICU)", category: "MEDICAL" },
+            { en: "pathology", cn: "病理學", category: "MEDICAL" },
+            { en: "prescription", cn: "處方箋", category: "MEDICAL" },
+            { en: "symptom", cn: "症狀", category: "MEDICAL" },
+            { en: "vaccination", cn: "疫苗接種", category: "MEDICAL" },
+
+            // Finance & Accounting (金融會計)
+            { en: "amortization", cn: "攤銷", category: "FINANCE" },
+            { en: "balance sheet", cn: "資產負債表", category: "FINANCE" },
+            { en: "capital gain", cn: "資本利得", category: "FINANCE" },
+            { en: "dividend", cn: "股利；分紅", category: "FINANCE" },
+            { en: "equity", cn: "股權；淨值", category: "FINANCE" },
+            { en: "liquidity", cn: "流動性", category: "FINANCE" },
+            { en: "portfolio", cn: "投資組合", category: "FINANCE" },
+            { en: "yield", cn: "收益率", category: "FINANCE" }
+        ];
+
+        // Global Application State
+        let customWordsList = [];
+        let currentQuestionList = [];
+        let currentQuestionIndex = 0;
+        let examScore = 0;
+        let userAnswers = []; // Store answer details
+        let examTimerInterval = null;
+        let secondsElapsed = 0;
+        let activeTestType = 2; // Default Test 2 (Excluding Test 1)
+        let activeExamMode = 'EXAM'; // 'EXAM' or 'PRACTICE'
+        let audioEnabled = true;
+
+        // Initialize on DOM load
+        window.onload = function() {
+            loadSavedCustomWords();
+            updateCategoryBadge();
+            renderVocabularyTable();
+            bindGlobalKeybindings();
+        };
+
+        // Audio Setting Switch
+        function toggleAudioSetting() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('audio-icon');
+            if (audioEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-lg';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-lg text-red-300';
+            }
+        }
+
+        // View Navigation Switcher
+        function switchView(viewId) {
+            const views = ['view-home', 'view-exam', 'view-result', 'view-words', 'view-history'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(viewId);
+            if (target) target.classList.remove('hidden');
+
+            if (viewId === 'view-words') {
+                renderVocabularyTable();
+            } else if (viewId === 'view-history') {
+                renderHistoryView();
+            }
+        }
+
+        // Category Selection Update
+        function onCategoryChange() {
+            updateCategoryBadge();
+        }
+
+        function getActiveVocabularyPool() {
+            const cat = document.getElementById('select-category').value;
+            let pool = [];
+
+            if (cat === 'CUSTOM') {
+                pool = [...customWordsList];
+            } else if (cat === 'EXPERT_ALL') {
+                pool = [...BUILTIN_VOCABULARY];
+            } else {
+                pool = BUILTIN_VOCABULARY.filter(w => w.category === cat || w.category === 'EXPERT_ALL');
+            }
+
+            if (pool.length === 0) {
+                pool = [...BUILTIN_VOCABULARY]; // Fallback if custom empty
+            }
+            return pool;
+        }
+
+        function updateCategoryBadge() {
+            const pool = getActiveVocabularyPool();
+            document.getElementById('word-count-badge').innerText = `可用題庫單字量: ${pool.length} 字`;
+        }
+
+        /* TEST GENERATION ENGINE (Excludes Test 1) */
+        function startSingleTest(testNum) {
+            if (testNum === 1) {
+                alert('測驗一 (聽寫) 已依指示關閉，請選擇測驗二至六！');
+                return;
+            }
+
+            activeTestType = testNum;
+            setupAndLaunchExam();
+        }
+
+        function startFullMockExam() {
+            activeTestType = 'MOCK'; // Randomly mix tests 2 to 6
+            setupAndLaunchExam();
+        }
+
+        function setupAndLaunchExam() {
+            const pool = getActiveVocabularyPool();
+            if (pool.length < 4) {
+                alert('當前類別字彙量少於4字，無法生成多選題選項。請先新增或匯入更多單字！');
+                return;
+            }
+
+            const countSelect = parseInt(document.getElementById('select-count').value);
+            activeExamMode = document.getElementById('select-mode').value;
+
+            // Pick random words from pool
+            const shuffledPool = shuffleArray([...pool]);
+            const selectedWords = shuffledPool.slice(0, Math.min(countSelect, shuffledPool.length));
+
+            // Generate questions list
+            currentQuestionList = selectedWords.map((wordItem, idx) => {
+                let testType = activeTestType;
+                if (activeTestType === 'MOCK') {
+                    // Random test between 2 and 6
+                    testType = Math.floor(Math.random() * 5) + 2;
+                }
+
+                // Generate 4 options for multiple choice tests (2,3,4,5)
+                let options = [];
+                if (testType !== 6) {
+                    options = generateOptions(wordItem, pool, testType);
+                }
+
+                return {
+                    id: idx + 1,
+                    testType: testType,
+                    word: wordItem.en,
+                    chinese: wordItem.cn,
+                    options: options, // Array of strings or object
+                    correctAnswer: getCorrectAnswerText(wordItem, testType)
+                };
+            });
+
+            // Reset Exam State
+            currentQuestionIndex = 0;
+            examScore = 0;
+            userAnswers = [];
+            secondsElapsed = 0;
+
+            // Start Timer
+            if (examTimerInterval) clearInterval(examTimerInterval);
+            examTimerInterval = setInterval(() => {
+                secondsElapsed++;
+                const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('exam-timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+
+            // Switch UI & Render Question
+            switchView('view-exam');
+            renderCurrentQuestion();
+        }
+
+        function getCorrectAnswerText(item, testType) {
+            if (testType === 2 || testType === 4) {
+                return item.cn; // Correct Chinese
+            } else {
+                return item.en; // Correct English
+            }
+        }
+
+        function generateOptions(targetItem, fullPool, testType) {
+            const isChineseOption = (testType === 2 || testType === 4);
+            const targetVal = isChineseOption ? targetItem.cn : targetItem.en;
+
+            // Distractors
+            const otherItems = fullPool.filter(w => (isChineseOption ? w.cn : w.en) !== targetVal);
+            const shuffledOthers = shuffleArray([...otherItems]);
+            const selectedDistractors = shuffledOthers.slice(0, 3).map(w => isChineseOption ? w.cn : w.en);
+
+            const allOpts = [targetVal, ...selectedDistractors];
+            return shuffleArray(allOpts);
+        }
+
+        /* RENDER LIVE QUESTION */
+        function renderCurrentQuestion() {
+            const q = currentQuestionList[currentQuestionIndex];
+            const totalQ = currentQuestionList.length;
+
+            // Update Progress HUD
+            document.getElementById('exam-progress-text').innerText = `${currentQuestionIndex + 1} / ${totalQ}`;
+            document.getElementById('exam-progress-bar').style.width = `${((currentQuestionIndex + 1) / totalQ) * 100}%`;
+            document.getElementById('q-index-number').innerText = currentQuestionIndex + 1;
+
+            // Mode Label
+            document.getElementById('exam-mode-badge').innerText = activeExamMode === 'EXAM' ? '正式測驗' : '自主練習';
+
+            // Test Badge & Title Config
+            const badgeEl = document.getElementById('exam-badge');
+            const qTypeLabel = document.getElementById('q-type-label');
+            const audioBox = document.getElementById('audio-question-box');
+            const textBox = document.getElementById('text-question-box');
+            const optionsGrid = document.getElementById('options-grid');
+            const spellingArea = document.getElementById('spelling-input-area');
+            const practiceFeedback = document.getElementById('practice-feedback');
+
+            practiceFeedback.classList.add('hidden');
+
+            // Configure Test-Specific Layout
+            switch (q.testType) {
+                case 2: // 聽英文選中文
+                    badgeEl.innerText = "測驗二：聽英文選中文";
+                    badgeEl.className = "bg-blue-100 text-blue-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                    qTypeLabel.innerText = "聽力詞義辨識";
+                    audioBox.classList.remove('hidden');
+                    textBox.classList.add('hidden');
+                    optionsGrid.classList.remove('hidden');
+                    spellingArea.classList.add('hidden');
+                    break;
+
+                case 3: // 聽英文選英文
+                    badgeEl.innerText = "測驗三：聽英文選英文";
+                    badgeEl.className = "bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                    qTypeLabel.innerText = "聽力單字對照";
+                    audioBox.classList.remove('hidden');
+                    textBox.classList.add('hidden');
+                    optionsGrid.classList.remove('hidden');
+                    spellingArea.classList.add('hidden');
+                    break;
+
+                case 4: // 看英文選中文
+                    badgeEl.innerText = "測驗四：看英文選中文";
+                    badgeEl.className = "bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                    qTypeLabel.innerText = "閱讀英譯中";
+                    audioBox.classList.add('hidden');
+                    textBox.classList.remove('hidden');
+                    document.getElementById('q-title-text').innerText = q.word;
+                    document.getElementById('q-sub-hint').innerText = "請選出對應的中文含意";
+                    optionsGrid.classList.remove('hidden');
+                    spellingArea.classList.add('hidden');
+                    break;
+
+                case 5: // 看中文選英文
+                    badgeEl.innerText = "測驗五：看中文選英文";
+                    badgeEl.className = "bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                    qTypeLabel.innerText = "閱讀中譯英";
+                    audioBox.classList.add('hidden');
+                    textBox.classList.remove('hidden');
+                    document.getElementById('q-title-text').innerText = q.chinese;
+                    document.getElementById('q-sub-hint').innerText = "請選出對應的英文單字";
+                    optionsGrid.classList.remove('hidden');
+                    spellingArea.classList.add('hidden');
+                    break;
+
+                case 6: // 看中文拼寫英文
+                    badgeEl.innerText = "測驗六：看中文拼寫英文";
+                    badgeEl.className = "bg-purple-100 text-purple-800 text-xs font-extrabold px-3 py-1 rounded-lg";
+                    qTypeLabel.innerText = "綜合單字拼寫";
+                    audioBox.classList.add('hidden');
+                    textBox.classList.remove('hidden');
+                    document.getElementById('q-title-text').innerText = q.chinese;
+                    // Provide spelling letter hint
+                    const hintStr = `${q.word.charAt(0)}... (${q.word.length} letters)`;
+                    document.getElementById('q-sub-hint').innerText = `首字提示：${hintStr}`;
+                    optionsGrid.classList.add('hidden');
+                    spellingArea.classList.remove('hidden');
+                    document.getElementById('input-spelling').value = '';
+                    setTimeout(() => document.getElementById('input-spelling').focus(), 100);
+                    break;
+            }
+
+            // Render Options for Multiple Choice
+            if (q.testType !== 6) {
+                optionsGrid.innerHTML = '';
+                q.options.forEach((optText, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full p-4 text-left border-2 border-slate-200 hover:border-pvqc-500 rounded-xl hover:bg-pvqc-50 transition flex items-center justify-between group active:scale-[0.99]";
+                    btn.onclick = () => selectOptionAnswer(optText, btn);
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-extrabold text-xs flex items-center justify-center group-hover:bg-pvqc-600 group-hover:text-white transition">
+                                ${index + 1}
+                            </span>
+                            <span class="font-bold text-slate-700 text-sm sm:text-base group-hover:text-pvqc-900">${optText}</span>
+                        </div>
+                        <i class="fa-regular fa-circle text-slate-300 group-hover:text-pvqc-500"></i>
+                    `;
+                    optionsGrid.appendChild(btn);
+                });
+            }
+
+            // Auto-play TTS audio for listening tests if enabled
+            if ((q.testType === 2 || q.testType === 3) && audioEnabled) {
+                setTimeout(() => playCurrentQuestionAudio(), 300);
+            }
+        }
+
+        // Speech Synthesis Audio Player
+        function playCurrentQuestionAudio() {
+            const q = currentQuestionList[currentQuestionIndex];
+            if (!q) return;
+
+            const textToSpeech = q.word;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop prior
+                const utterance = new SpeechSynthesisUtterance(textToSpeech);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // Slightly clear PVQC exam speed
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakWord(wordText) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(wordText);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        /* ANSWER EVALUATION LOGIC */
+        function selectOptionAnswer(selectedText, btnEl) {
+            const q = currentQuestionList[currentQuestionIndex];
+            const isCorrect = (selectedText.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase());
+
+            recordAnswerAndProceed(selectedText, isCorrect, btnEl);
+        }
+
+        function submitSpellingAnswer() {
+            const q = currentQuestionList[currentQuestionIndex];
+            const inputVal = document.getElementById('input-spelling').value.trim();
+            if (!inputVal) return;
+
+            const isCorrect = (inputVal.toLowerCase() === q.word.toLowerCase());
+            recordAnswerAndProceed(inputVal, isCorrect);
+        }
+
+        function skipQuestion() {
+            recordAnswerAndProceed("(未答/跳過)", false);
+        }
+
+        function recordAnswerAndProceed(userAns, isCorrect, btnEl = null) {
+            const q = currentQuestionList[currentQuestionIndex];
+
+            // Store detailed record
+            userAnswers.push({
+                questionNumber: currentQuestionIndex + 1,
+                testType: q.testType,
+                word: q.word,
+                chinese: q.chinese,
+                userAnswer: userAns,
+                correctAnswer: q.correctAnswer,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                examScore += (100 / currentQuestionList.length);
+            }
+
+            // PRACTICE MODE: Show instant feedback
+            if (activeExamMode === 'PRACTICE') {
+                const feedbackBox = document.getElementById('practice-feedback');
+                const feedbackIcon = document.getElementById('feedback-icon');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const feedbackDetail = document.getElementById('feedback-detail');
+
+                feedbackBox.classList.remove('hidden');
+
+                if (isCorrect) {
+                    feedbackBox.className = "p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between";
+                    feedbackIcon.className = "fa-solid fa-circle-check text-emerald-600 text-2xl";
+                    feedbackTitle.innerText = "答對了！恭喜回答正確！";
+                    feedbackDetail.innerText = `${q.word} = ${q.chinese}`;
+                } else {
+                    feedbackBox.className = "p-4 rounded-xl border border-red-200 bg-red-50 text-red-800 flex items-center justify-between";
+                    feedbackIcon.className = "fa-solid fa-circle-xmark text-red-600 text-2xl";
+                    feedbackTitle.innerText = "答錯囉！";
+                    feedbackDetail.innerText = `正確答案為：${q.correctAnswer} (${q.word} - ${q.chinese})`;
+                }
+
+                // Play pronunciation on answer feedback
+                speakWord(q.word);
+            } else {
+                // EXAM MODE: Immediate step to next
+                nextQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuestionList.length) {
+                renderCurrentQuestion();
+            } else {
+                finishExam();
+            }
+        }
+
+        /* FINISH EXAM & RENDER RESULTS */
+        function finishExam() {
+            if (examTimerInterval) clearInterval(examTimerInterval);
+
+            const finalScoreRound = Math.round(examScore);
+            const totalQ = currentQuestionList.length;
+            const correctCount = userAnswers.filter(a => a.isCorrect).length;
+            const accuracyPercent = Math.round((correctCount / totalQ) * 100);
+
+            // Update UI Score Elements
+            document.getElementById('res-score').innerText = finalScoreRound;
+            document.getElementById('res-accuracy').innerText = `${accuracyPercent}%`;
+            document.getElementById('res-counts-text').innerText = `${correctCount} / ${totalQ} 題`;
+
+            // Time spend
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('res-time').innerText = `${mins}:${secs}`;
+            document.getElementById('res-avg-time').innerText = `${(secondsElapsed / totalQ).toFixed(1)}s`;
+
+            // Pass/Fail Grade (Standard PVQC pass is 70 points)
+            const stamp = document.getElementById('result-stamp');
+            const gradeText = document.getElementById('res-grade');
+            if (finalScoreRound >= 70) {
+                stamp.innerText = "PASSED";
+                stamp.className = "absolute -right-6 -top-6 w-32 h-32 rounded-full border-4 border-emerald-500 text-emerald-600 flex items-center justify-center font-black text-xl rotate-12 opacity-80 pointer-events-none bg-emerald-50/50";
+                gradeText.innerText = "檢定合格";
+                gradeText.className = "text-xl sm:text-2xl font-black text-emerald-600 block mt-1";
+            } else {
+                stamp.innerText = "FAILED";
+                stamp.className = "absolute -right-6 -top-6 w-32 h-32 rounded-full border-4 border-red-400 text-red-500 flex items-center justify-center font-black text-xl rotate-12 opacity-80 pointer-events-none bg-red-50/50";
+                gradeText.innerText = "未達標準";
+                gradeText.className = "text-xl sm:text-2xl font-black text-red-500 block mt-1";
+            }
+
+            // Wrong answers count tag
+            const wrongCount = totalQ - correctCount;
+            document.getElementById('wrong-count-tag').innerText = wrongCount;
+            const retestBtn = document.getElementById('btn-retest-wrong');
+            if (wrongCount === 0) {
+                retestBtn.disabled = true;
+                retestBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                retestBtn.disabled = false;
+                retestBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Render Detailed Review Rows
+            renderReviewList('ALL');
+
+            // Save to Local History
+            saveExamToHistory({
+                date: new Date().toLocaleString('zh-TW'),
+                score: finalScoreRound,
+                accuracy: accuracyPercent,
+                timeSpent: `${mins}:${secs}`,
+                questionCount: totalQ,
+                testType: activeTestType
+            });
+
+            switchView('view-result');
+        }
+
+        function renderReviewList(filter) {
+            const container = document.getElementById('review-list-container');
+            container.innerHTML = '';
+
+            userAnswers.forEach((ans, i) => {
+                if (filter === 'WRONG' && ans.isCorrect) return;
+
+                const row = document.createElement('div');
+                row.className = `p-4 rounded-xl border ${ans.isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`;
+
+                row.innerHTML = `
+                    <div class="flex items-start sm:items-center gap-3">
+                        <span class="w-6 h-6 rounded-full ${ans.isCorrect ? 'bg-emerald-500' : 'bg-red-500'} text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                            ${ans.questionNumber}
+                        </span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-extrabold text-slate-800 text-base">${ans.word}</h4>
+                                <button onclick="speakWord('${ans.word}')" class="text-pvqc-600 hover:text-pvqc-800 text-sm">
+                                    <i class="fa-solid fa-volume-high"></i>
+                                </button>
+                                <span class="text-xs text-slate-400 bg-white border px-1.5 py-0.5 rounded">測驗${ans.testType}</span>
+                            </div>
+                            <p class="text-xs text-slate-600 font-medium">中文對譯: ${ans.chinese}</p>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-right space-y-0.5 w-full sm:w-auto">
+                        <p class="${ans.isCorrect ? 'text-emerald-700 font-bold' : 'text-red-600 font-bold'}">
+                            您的回答: ${ans.userAnswer}
+                        </p>
+                        ${!ans.isCorrect ? `<p class="text-slate-500">正確答案: <strong class="text-slate-800">${ans.correctAnswer}</strong></p>` : ''}
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function filterReviewList(mode) {
+            renderReviewList(mode);
+        }
+
+        /* RETEST WRONG WORDS FUNCTIONALITY */
+        function retestWrongWords() {
+            const wrongAnswers = userAnswers.filter(a => !a.isCorrect);
+            if (wrongAnswers.length === 0) return;
+
+            const pool = getActiveVocabularyPool();
+
+            currentQuestionList = wrongAnswers.map((item, idx) => {
+                const wordObj = { en: item.word, cn: item.chinese };
+                return {
+                    id: idx + 1,
+                    testType: item.testType,
+                    word: item.word,
+                    chinese: item.chinese,
+                    options: generateOptions(wordObj, pool, item.testType),
+                    correctAnswer: item.correctAnswer
+                };
+            });
+
+            currentQuestionIndex = 0;
+            examScore = 0;
+            userAnswers = [];
+            secondsElapsed = 0;
+
+            switchView('view-exam');
+            renderCurrentQuestion();
+        }
+
+        function confirmAbortExam() {
+            if (confirm('確定要離開本次測驗嗎？目前的作答進度將不會保存。')) {
+                if (examTimerInterval) clearInterval(examTimerInterval);
+                switchView('view-home');
+            }
+        }
+
+        /* VOCABULARY TABLE & CSV IMPORTER ENGINE */
+        function renderVocabularyTable() {
+            const pool = getActiveVocabularyPool();
+            const searchVal = document.getElementById('word-search-input').value.toLowerCase();
+            const catFilter = document.getElementById('word-category-filter').value;
+            const tbody = document.getElementById('word-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = pool.filter(item => {
+                const matchesSearch = item.en.toLowerCase().includes(searchVal) || item.cn.includes(searchVal);
+                const matchesCat = (catFilter === 'ALL' || item.category === catFilter);
+                return matchesSearch && matchesCat;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-xs text-slate-400">查無相符的單字資料</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-xs font-mono text-slate-400">${index + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.en}</td>
+                    <td class="py-3 px-4 text-slate-600">${item.cn}</td>
+                    <td class="py-3 px-4"><span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded">${item.category}</span></td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="speakWord('${item.en}')" class="p-2 text-pvqc-600 hover:text-pvqc-800 transition">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openCsvImportModal() {
+            document.getElementById('modal-csv-import').classList.remove('hidden');
+        }
+
+        function closeCsvImportModal() {
+            document.getElementById('modal-csv-import').classList.add('hidden');
+        }
+
+        function processCustomCsvImport() {
+            const text = document.getElementById('csv-paste-textarea').value.trim();
+            if (!text) {
+                alert('請先貼上 CSV 文字內容！');
+                return;
+            }
+
+            const lines = text.split('\n');
+            let addedCount = 0;
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                // Support comma or TAB separation
+                let parts = trimmed.split(',');
+                if (parts.length < 2) {
+                    parts = trimmed.split('\t');
+                }
+
+                if (parts.length >= 2) {
+                    const enStr = parts[0].trim();
+                    const cnStr = parts[1].trim();
+
+                    if (enStr && cnStr) {
+                        customWordsList.push({
+                            en: enStr,
+                            cn: cnStr,
+                            category: 'CUSTOM'
+                        });
+                        addedCount++;
+                    }
+                }
+            });
+
+            if (addedCount > 0) {
+                saveCustomWordsLocally();
+                alert(`成功匯入 ${addedCount} 個自訂 PVQC 單字！`);
+                document.getElementById('csv-paste-textarea').value = '';
+                closeCsvImportModal();
+
+                // Select Custom category automatically
+                document.getElementById('select-category').value = 'CUSTOM';
+                updateCategoryBadge();
+                renderVocabularyTable();
+            } else {
+                alert('未能解析有效單字，請檢查格式是否為每行「英文,中文」。');
+            }
+        }
+
+        function saveCustomWordsLocally() {
+            localStorage.setItem('pvqc_custom_words', JSON.stringify(customWordsList));
+        }
+
+        function loadSavedCustomWords() {
+            const saved = localStorage.getItem('pvqc_custom_words');
+            if (saved) {
+                try {
+                    customWordsList = JSON.parse(saved);
+                } catch(e) {
+                    customWordsList = [];
+                }
+            }
+        }
+
+        /* EXAM HISTORY STORAGE */
+        function saveExamToHistory(record) {
+            let history = [];
+            const saved = localStorage.getItem('pvqc_exam_history');
+            if (saved) {
+                try { history = JSON.parse(saved); } catch(e) { history = []; }
+            }
+            history.unshift(record);
+            localStorage.setItem('pvqc_exam_history', JSON.stringify(history));
+        }
+
+        function renderHistoryView() {
+            const container = document.getElementById('history-list-container');
+            container.innerHTML = '';
+
+            const saved = localStorage.getItem('pvqc_exam_history');
+            let history = [];
+            if (saved) {
+                try { history = JSON.parse(saved); } catch(e) { history = []; }
+            }
+
+            if (history.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm">尚無任何測驗歷史紀錄。快去進行一次測驗吧！</div>`;
+                return;
+            }
+
+            history.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-slate-800 text-lg">${item.score} 分</span>
+                            <span class="text-xs px-2 py-0.5 rounded font-bold ${item.score >= 70 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                                ${item.score >= 70 ? '檢定合格' : '未達標準'}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">
+                            時間: ${item.date} | 題數: ${item.questionCount} 題 | 耗時: ${item.timeSpent}
+                        </p>
+                    </div>
+                    <div class="text-xs text-right">
+                        <span class="text-slate-600 font-bold">正確率: ${item.accuracy}%</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function clearHistoryRecords() {
+            if (confirm('確定要清除所有歷史成績紀錄嗎？')) {
+                localStorage.removeItem('pvqc_exam_history');
+                renderHistoryView();
+            }
+        }
+
+        /* GLOBAL UTILITIES & KEYBOARD SHORTCUTS */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function bindGlobalKeybindings() {
+            document.addEventListener('keydown', (e) => {
+                const examView = document.getElementById('view-exam');
+                if (examView.classList.contains('hidden')) return;
+
+                const q = currentQuestionList[currentQuestionIndex];
+                if (!q) return;
+
+                // Key 1 - 4 for options
+                if (q.testType !== 6) {
+                    if (['1', '2', '3', '4'].includes(e.key)) {
+                        const optIndex = parseInt(e.key) - 1;
+                        const btns = document.querySelectorAll('#options-grid button');
+                        if (btns[optIndex]) {
+                            btns[optIndex].click();
+                        }
+                    }
+                } else {
+                    if (e.key === 'Enter') {
+                        submitSpellingAnswer();
+                    }
+                }
+
+                // Space key for playing audio
+                if (e.code === 'Space' && (q.testType === 2 || q.testType === 3)) {
+                    e.preventDefault();
+                    playCurrentQuestionAudio();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

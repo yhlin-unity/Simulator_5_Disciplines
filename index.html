@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PVQC 專業英文詞彙能力模擬考試系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="PVQC_Expert_MP3/audio-manifest.js"></script>
+    <script src="script.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-full font-sans text-slate-800 antialiased flex flex-col bg-slate-100 selection:bg-pvqc-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-pvqc-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('view-home')">
+                <div class="bg-pvqc-600 p-2 rounded-lg text-white shadow-inner">
+                    <i class="fa-solid fa-graduation-cap text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl tracking-tight leading-none flex items-center gap-2">
+                        PVQC 模擬檢定系統
+                        <span class="text-xs font-normal bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full font-bold">六種測驗全收錄</span>
+                    </h1>
+                    <p class="text-xs text-pvqc-100 hidden sm:block">Professional Vocabulary Quotient Credential Simulator</p>
+                </div>
+            </div>
+
+            <!-- Top Nav Options -->
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <button onclick="switchView('view-home')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-pvqc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden md:inline">測驗大廳</span>
+                </button>
+                <button onclick="switchView('view-words')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-pvqc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span class="hidden md:inline">字彙瀏覽與匯入</span>
+                </button>
+                <button onclick="switchView('view-history')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-pvqc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span class="hidden md:inline">歷次成績分析</span>
+                </button>
+                
+                <!-- Audio Status Indicator -->
+                <button id="audio-toggle-btn" onclick="toggleAudioSetting()" class="p-2 rounded-lg hover:bg-pvqc-800 transition text-pvqc-100 hover:text-white" title="聲音切換">
+                    <i id="audio-icon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- VIEW 1: HOME / TEST SELECTION DASHBOARD -->
+        <section id="view-home" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-pvqc-800 to-indigo-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-black pointer-events-none">
+                    PVQC
+                </div>
+                <div class="max-w-2xl space-y-3 relative z-10">
+                    <div class="inline-flex items-center gap-2 bg-pvqc-600/50 border border-pvqc-400/30 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-pvqc-100">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i> PVQC 六種測驗題型完整收錄
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">PVQC 專家級與各專業領域詞彙大師</h2>
+                    <p class="text-pvqc-100 text-sm sm:text-base leading-relaxed">
+                        依據 PVQC 六種測驗方式練習專業字彙，支援單項練習、綜合模擬、語音朗讀與錯題檢討。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Configuration Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-pvqc-600"></i> 測驗設定與類別選擇
+                        </h3>
+                        <p class="text-xs text-slate-500">選擇欲練習的專業字彙領域及測驗參數</p>
+                    </div>
+                    <span id="word-count-badge" class="bg-pvqc-50 text-pvqc-700 text-xs font-bold px-3 py-1 rounded-full border border-pvqc-200">
+                        載入中...
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Word Dataset Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">專業詞彙類別</label>
+                        <select id="select-category" onchange="onCategoryChange()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-pvqc-500 focus:border-pvqc-500 transition">
+                            <option value="EXPERT_ALL">全套 PVQC 專家級 A-Z 字彙 (內建組)</option>
+                            <option value="IT_COMPUTER">資訊與計算機專業詞彙 (IT & CS)</option>
+                            <option value="DIGITAL_MULTIMEDIA">數位多媒體設計 (Digital Multimedia Design)</option>
+                            <option value="BUSINESS">商業管理與企劃 (Business & Mgmt)</option>
+                            <option value="HOSPITALITY">餐旅與觀光英文 (Hospitality)</option>
+                            <option value="MEDICAL">醫護與健康照護 (Medical & Care)</option>
+                            <option value="FINANCE">金融與財務會計 (Finance & Accounting)</option>
+                            <option value="CUSTOM">自訂匯入字彙庫 (Custom Imported)</option>
+                        </select>
+                    </div>
+
+                    <!-- Question Count Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">測驗題數</label>
+                        <select id="select-count" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-pvqc-500 focus:border-pvqc-500 transition">
+                            <option value="10">10 題 (快速隨堂練習)</option>
+                            <option value="20" selected>20 題 (標準題數)</option>
+                            <option value="50">50 題 (深度測驗)</option>
+                            <option value="100">100 題 (全真模擬極限挑戰)</option>
+                        </select>
+                    </div>
+
+                    <!-- Mode Select -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">測驗模式</label>
+                        <select id="select-mode" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-pvqc-500 focus:border-pvqc-500 transition">
+                            <option value="EXAM">正式考試模式 (計時 / 結束後顯示總分與錯題)</option>
+                            <option value="PRACTICE">自主練習模式 (無時間限制 / 即時提示答案)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Types Grid (Test 2 to Test 6) -->
+            <div>
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-pvqc-600"></i> PVQC 測驗項目選擇 (測驗一 ~ 測驗六)
+                    </h3>
+                    <button onclick="startFullMockExam()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow hover:shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> 綜合全真模擬試驗 (測驗1~6綜合題)
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+                    <!-- Test 1 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between"><div class="space-y-3"><div class="flex items-center justify-between"><span class="bg-slate-100 text-slate-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗一</span><span class="text-xs text-slate-600 font-bold bg-slate-50 px-2 py-0.5 rounded"><i class="fa-solid fa-pen"></i> 拼寫測驗</span></div><h4 class="font-bold text-slate-800 text-lg">看中文，拼寫英文</h4><p class="text-xs text-slate-500 leading-relaxed">閱讀中文提示，輸入正確的英文專業字彙。</p></div><div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between"><span class="text-xs text-slate-400">中譯英拼寫</span><button onclick="startSingleTest(1)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm">開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div>
+
+                    <!-- Test 2 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-blue-100 text-pvqc-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗二</span>
+                                <span class="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded"><i class="fa-solid fa-headphones"></i> 聽力測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">聽英文發音，選中文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                系統自動朗讀英文單字，請聽取發音後選出正確的中文解釋。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">單字聽力辨識</span>
+                            <button onclick="startSingleTest(2)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 3 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗三</span>
+                                <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded"><i class="fa-solid fa-headphones"></i> 聽力測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">聽英文發音，選英文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                系統自動朗讀英文單字發音，請於選項中選出拼法相符之英文單字。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">發音拼字對照</span>
+                            <button onclick="startSingleTest(3)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 4 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗四</span>
+                                <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded"><i class="fa-solid fa-eye"></i> 閱讀測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">看英文，選中文</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                畫面顯示英文單字/專業術語，請從四個選項中選出正確中文翻譯。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">英譯中詞義辨識</span>
+                            <button onclick="startSingleTest(4)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 5 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-amber-100 text-amber-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗五</span>
+                                <span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded"><i class="fa-solid fa-headphones"></i> 閱讀聽辨</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">看中文，聽選英文發音</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                畫面顯示中文專業術語，點選選項旁的喇叭試聽，再選出對應的英文單字。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">中譯英發音辨識</span>
+                            <button onclick="startSingleTest(5)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test 6 Card -->
+                    <div class="bg-white border border-slate-200 hover:border-pvqc-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-purple-100 text-purple-800 text-xs font-black px-2.5 py-1 rounded-lg">測驗六</span>
+                                <span class="text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded"><i class="fa-solid fa-headphones"></i> 聽力測驗</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-pvqc-600 transition">看英文，聽選英文發音</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                畫面顯示英文單字，點選各選項旁的喇叭試聽，選出發音相符的英文單字。
+                            </p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">英文發音辨識</span>
+                            <button onclick="startSingleTest(6)" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm group-hover:scale-105">
+                                開始測驗 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: LIVE EXAM INTERFACE -->
+        <section id="view-exam" class="hidden space-y-6 max-w-4xl mx-auto">
+            <!-- Top Exam Bar -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span id="exam-badge" class="bg-pvqc-100 text-pvqc-800 text-xs font-extrabold px-3 py-1 rounded-lg">
+                        測驗二
+                    </span>
+                    <span id="exam-mode-badge" class="bg-slate-100 text-slate-700 text-xs font-bold px-2 py-1 rounded-md">
+                        正式測驗
+                    </span>
+                </div>
+
+                <!-- Timer & Score HUD -->
+                <div class="flex items-center gap-4">
+                    <div id="timer-container" class="flex items-center gap-1.5 font-mono text-base font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+                        <i class="fa-regular fa-clock text-pvqc-600"></i>
+                        <span id="exam-timer">00:00</span>
+                    </div>
+                    <button onclick="confirmAbortExam()" class="text-xs text-slate-400 hover:text-red-600 font-medium transition">
+                        <i class="fa-solid fa-xmark"></i> 離開測驗
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-xs font-semibold text-slate-500">
+                    <span>進度: <strong id="exam-progress-text" class="text-slate-800">1 / 20</strong></span>
+                    <span id="exam-accuracy-indicator">正確率: -- %</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                    <div id="exam-progress-bar" class="bg-pvqc-600 h-2.5 rounded-full transition-all duration-300" style="width: 5%"></div>
+                </div>
+            </div>
+
+            <!-- Main Question Card -->
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 space-y-6 relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-pvqc-600 bg-pvqc-50 px-2.5 py-1 rounded-md">
+                        Question <span id="q-index-number">1</span>
+                    </span>
+                    <span id="q-type-label" class="text-xs font-medium text-slate-400">
+                        聽力選義
+                    </span>
+                </div>
+
+                <!-- Audio Playback Control (for Listening Tests 2 & 3) -->
+                <div id="audio-question-box" class="flex flex-col items-center justify-center py-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                    <button id="btn-play-audio" onclick="playCurrentQuestionAudio()" class="w-16 h-16 bg-pvqc-600 hover:bg-pvqc-700 active:scale-95 text-white rounded-full shadow-lg flex items-center justify-center text-2xl transition group">
+                        <i class="fa-solid fa-volume-high group-hover:scale-110 transition"></i>
+                    </button>
+                    <p class="text-xs font-semibold text-slate-500">點擊播放發音 (快速鍵: Space 空格鍵)</p>
+                </div>
+
+                <!-- Text Question Box (for Reading Tests 4, 5, 6) -->
+                <div id="text-question-box" class="text-center py-4 space-y-2">
+                    <h3 id="q-title-text" class="text-2xl sm:text-4xl font-extrabold text-slate-800 tracking-tight">
+                        Algorithm
+                    </h3>
+                    <p id="q-sub-hint" class="text-xs text-slate-400 font-medium">請選出正確的中文對意</p>
+                </div>
+
+                <!-- Multiple Choice Options Grid (Tests 2 to 6) -->
+                <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <!-- Option buttons dynamically rendered -->
+                </div>
+
+                <!-- Spelling Input Area (Test 1) -->
+                <div id="spelling-input-area" class="hidden space-y-4 pt-2">
+                    <div class="flex items-center justify-center gap-2">
+                        <input type="text" id="input-spelling" autocomplete="off" spellcheck="false" placeholder="請輸入對應的英文單字..." class="w-full max-w-md px-4 py-3 text-center text-lg sm:text-xl font-bold font-mono tracking-wide border-2 border-slate-300 rounded-xl focus:border-pvqc-600 focus:ring-0 outline-none uppercase transition">
+                    </div>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="submitSpellingAnswer()" class="bg-pvqc-600 hover:bg-pvqc-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow transition">
+                            確認送出 (Enter)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instant Feedback Alert Box (Practice Mode Only) -->
+                <div id="practice-feedback" class="hidden p-4 rounded-xl border flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i id="feedback-icon" class="text-2xl"></i>
+                        <div>
+                            <p id="feedback-title" class="font-bold text-sm"></p>
+                            <p id="feedback-detail" class="text-xs opacity-90"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion()" class="bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-slate-900 transition">
+                        下一題 <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Action Controls -->
+            <div class="flex justify-between items-center text-xs text-slate-500 px-1">
+                <span>提示: 可使用數字鍵 <kbd class="px-1.5 py-0.5 bg-white border rounded text-slate-700 font-mono">1</kbd> ~ <kbd class="px-1.5 py-0.5 bg-white border rounded text-slate-700 font-mono">4</kbd> 快速作答</span>
+                <button id="btn-skip" onclick="skipQuestion()" class="text-slate-500 hover:text-slate-800 font-bold underline">
+                    跳過此題
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 3: EXAM RESULTS & REVIEW -->
+        <section id="view-result" class="hidden space-y-6 max-w-4xl mx-auto">
+            <!-- Score Card Header -->
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8 text-center space-y-4 relative overflow-hidden">
+                <div id="result-stamp" class="absolute -right-6 -top-6 w-32 h-32 rounded-full border-4 flex items-center justify-center font-black text-xl rotate-12 opacity-80 pointer-events-none">
+                    PASSED
+                </div>
+
+                <div class="inline-flex p-3 rounded-full bg-pvqc-50 text-pvqc-600 text-3xl mb-2">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">測驗完成與評分報告</h2>
+                <p id="result-subtitle" class="text-xs sm:text-sm text-slate-500">恭喜您完成了 PVQC 模擬測驗！以下為您的整體成績表現：</p>
+
+                <!-- Score Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">測驗得分</span>
+                        <span id="res-score" class="text-2xl sm:text-3xl font-black text-pvqc-600">0</span>
+                        <span class="text-xs text-slate-400">/ 100 分</span>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">答對率</span>
+                        <span id="res-accuracy" class="text-2xl sm:text-3xl font-black text-emerald-600">0%</span>
+                        <span id="res-counts-text" class="text-xs text-slate-400 block">0 / 0 題</span>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">總耗時</span>
+                        <span id="res-time" class="text-2xl sm:text-3xl font-black text-slate-700">00:00</span>
+                        <span class="text-xs text-slate-400 block">平均速: <span id="res-avg-time">0s</span>/題</span>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 font-semibold block">認證評定</span>
+                        <span id="res-grade" class="text-xl sm:text-2xl font-black text-amber-500 block mt-1">未通過</span>
+                        <span class="text-xs text-slate-400">門檻: 70分以上</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap justify-center gap-3 pt-2">
+                    <button onclick="retestWrongWords()" id="btn-retest-wrong" class="bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> 錯題特別重測 (<span id="wrong-count-tag">0</span>)
+                    </button>
+                    <button onclick="switchView('view-home')" class="bg-pvqc-600 hover:bg-pvqc-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> 再測一次
+                    </button>
+                    <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> 列印/保存成績
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detailed Answer Review List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-pvqc-600"></i> 逐題完整答題檢討與發音複習
+                    </h3>
+                    <div class="flex gap-2">
+                        <button onclick="filterReviewList('ALL')" class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-200 text-slate-700 hover:bg-slate-300">全部</button>
+                        <button onclick="filterReviewList('WRONG')" class="text-xs font-semibold px-2.5 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200">僅看錯題</button>
+                    </div>
+                </div>
+
+                <div id="review-list-container" class="space-y-3">
+                    <!-- Detailed review rows rendered dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: VOCABULARY LIBRARY & CSV IMPORTER -->
+        <section id="view-words" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-book text-pvqc-600"></i> PVQC 字彙庫總覽與自訂匯入
+                        </h3>
+                        <p class="text-xs text-slate-500">瀏覽系統內建與您自行匯入的 PVQC 專家級對照單字</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openCsvImportModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i> 匯入 CSV / 自訂單字
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Controls -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2 relative">
+                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="word-search-input" onkeyup="renderVocabularyTable()" placeholder="搜尋英文單字或中文解釋..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-pvqc-500 outline-none">
+                    </div>
+                    <div>
+                        <select id="word-category-filter" onchange="renderVocabularyTable()" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-700">
+                            <option value="ALL">全部類別單字</option>
+                            <option value="EXPERT_ALL">專家級字彙 (General Expert)</option>
+                            <option value="IT_COMPUTER">資訊科技 (IT / CS)</option>
+                            <option value="DIGITAL_MULTIMEDIA">數位多媒體設計 (Digital Multimedia Design)</option>
+                            <option value="BUSINESS">商管領域 (Business)</option>
+                            <option value="HOSPITALITY">餐旅英文 (Hospitality)</option>
+                            <option value="MEDICAL">醫護與健康 (Medical)</option>
+                            <option value="FINANCE">金融財務 (Finance)</option>
+                            <option value="CUSTOM">自訂匯入 (Custom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Word Table Container -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-xs uppercase font-bold text-slate-700 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3 px-4">#</th>
+                                <th class="py-3 px-4">英文單字 (English)</th>
+                                <th class="py-3 px-4">中文解釋 (Chinese)</th>
+                                <th class="py-3 px-4">歸屬領域</th>
+                                <th class="py-3 px-4 text-center">發音試聽</th>
+                            </tr>
+                        </thead>
+                        <tbody id="word-table-body" class="divide-y divide-slate-200 bg-white">
+                            <!-- Rows generated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: HISTORY & STATISTICS -->
+        <section id="view-history" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-pvqc-600"></i> 歷次測驗成績紀錄與學習曲線
+                        </h3>
+                        <p class="text-xs text-slate-500">本系統會將您的個人測驗結果保存在個人瀏覽器中</p>
+                    </div>
+                    <button onclick="clearHistoryRecords()" class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition">
+                        <i class="fa-solid fa-trash"></i> 清除歷史紀錄
+                    </button>
+                </div>
+
+                <div id="history-list-container" class="space-y-3">
+                    <!-- History rows dynamic -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CSV IMPORT MODAL DIALOG -->
+    <div id="modal-csv-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-file-csv text-emerald-600"></i> 自訂匯入 PVQC 字彙單字表
+                </h3>
+                <button onclick="closeCsvImportModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-500 leading-relaxed">
+                選擇 CSV 檔案匯入字彙，欄位格式為「英文單字,中文解釋」。支援 UTF-8 編碼及含標題列的 CSV。
+            </p>
+
+            <div>
+                <label for="csv-file-input" class="block text-xs font-bold text-slate-700 mb-1">選擇 CSV 檔案：</label>
+                <input id="csv-file-input" type="file" accept=".csv,text/csv" class="w-full p-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-pvqc-500 outline-none">
+                <p id="csv-file-name" class="mt-2 text-xs text-slate-500">尚未選擇檔案</p>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <span class="text-xs text-slate-400">請確認第一欄為英文、第二欄為中文</span>
+                <div class="flex gap-2">
+                    <button onclick="closeCsvImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">取消</button>
+                    <button onclick="processCustomCsvImport()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition">匯入 CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-xs text-slate-500 py-5 border-t border-slate-200">© 2026 多媒體設計系 創新設計學院 致理科技大學。本網站原始程式與頁面設計保留所有權利。<br>PVQC 詞彙資料及第三方字型、圖示與程式庫依各自權利或授權使用。</footer>
+
+</body>
+</html>
+
